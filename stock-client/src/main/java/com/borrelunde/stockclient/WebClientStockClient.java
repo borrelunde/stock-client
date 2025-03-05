@@ -23,6 +23,7 @@ public class WebClientStockClient implements StockClient {
 
 	@Override
 	public Flux<StockPrice> pricesFor(final String symbol) {
+		log.info("WebClient stock client");
 		return webClient.get()
 				.uri("http://localhost:8080/stocks/{symbol}", symbol)
 				.retrieve()
