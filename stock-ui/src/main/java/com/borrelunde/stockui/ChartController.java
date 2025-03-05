@@ -38,7 +38,7 @@ public class ChartController {
 		stockClient.pricesFor(symbolOne).subscribe(priceSubscriberOne);
 
 		final String symbolTwo = "SYMBOL2";
-		final PriceSubscriber priceSubscriberTwo = new PriceSubscriber(symbolOne);
+		final PriceSubscriber priceSubscriberTwo = new PriceSubscriber(symbolTwo);
 		stockClient.pricesFor(symbolTwo).subscribe(priceSubscriberTwo);
 
 		final ObservableList<Series<String, Double>> data = observableArrayList();
