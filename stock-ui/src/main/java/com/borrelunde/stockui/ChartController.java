@@ -1,7 +1,7 @@
 package com.borrelunde.stockui;
 
+import com.borrelunde.stockclient.StockClient;
 import com.borrelunde.stockclient.StockPrice;
-import com.borrelunde.stockclient.WebClientStockClient;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -25,21 +25,21 @@ public class ChartController {
 	@FXML
 	public LineChart<String, Double> chart;
 
-	private final WebClientStockClient webClientStockClient;
+	private final StockClient stockClient;
 
-	public ChartController(final WebClientStockClient webClientStockClient) {
-		this.webClientStockClient = webClientStockClient;
+	public ChartController(final StockClient stockClient) {
+		this.stockClient = stockClient;
 	}
 
 	@FXML
 	public void initialize() {
 		final String symbolOne = "SYMBOL1";
 		final PriceSubscriber priceSubscriberOne = new PriceSubscriber(symbolOne);
-		webClientStockClient.pricesFor(symbolOne).subscribe(priceSubscriberOne);
+		stockClient.pricesFor(symbolOne).subscribe(priceSubscriberOne);
 
 		final String symbolTwo = "SYMBOL2";
 		final PriceSubscriber priceSubscriberTwo = new PriceSubscriber(symbolOne);
-		webClientStockClient.pricesFor(symbolTwo).subscribe(priceSubscriberTwo);
+		stockClient.pricesFor(symbolTwo).subscribe(priceSubscriberTwo);
 
 		final ObservableList<Series<String, Double>> data = observableArrayList();
 		data.add(priceSubscriberOne.getSeries());

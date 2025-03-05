@@ -14,13 +14,14 @@ import static reactor.util.retry.Retry.*;
  * @since 2025.03.04
  */
 @Log4j2
-public class WebClientStockClient {
+public class WebClientStockClient implements StockClient {
 	private final WebClient webClient;
 
 	public WebClientStockClient(final WebClient webClient) {
 		this.webClient = webClient;
 	}
 
+	@Override
 	public Flux<StockPrice> pricesFor(final String symbol) {
 		return webClient.get()
 				.uri("http://localhost:8080/stocks/{symbol}", symbol)
