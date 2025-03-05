@@ -20,13 +20,12 @@ import static javafx.collections.FXCollections.observableArrayList;
  * @since 2025.03.04
  */
 @Component
-public class ChartController implements Consumer<StockPrice> {
+public class ChartController {
 
 	@FXML
 	public LineChart<String, Double> chart;
 
 	private final WebClientStockClient webClientStockClient;
-	private final ObservableList<Data<String, Double>> seriesData = observableArrayList();
 
 	public ChartController(final WebClientStockClient webClientStockClient) {
 		this.webClientStockClient = webClientStockClient;
@@ -34,20 +33,40 @@ public class ChartController implements Consumer<StockPrice> {
 
 	@FXML
 	public void initialize() {
-		final String symbol = "SYMBOL";
-		final ObservableList<Series<String, Double>> data = observableArrayList();
-		data.add(new Series<>(symbol, seriesData));
-		chart.setData(data);
+		final String symbolOne = "SYMBOL1";
+		final PriceSubscriber priceSubscriberOne = new PriceSubscriber(symbolOne);
+		webClientStockClient.pricesFor(symbolOne).subscribe(priceSubscriberOne);
 
-		webClientStockClient.pricesFor(symbol).subscribe(this);
+		final String symbolTwo = "SYMBOL2";
+		final PriceSubscriber priceSubscriberTwo = new PriceSubscriber(symbolOne);
+		webClientStockClient.pricesFor(symbolTwo).subscribe(priceSubscriberTwo);
+
+		final ObservableList<Series<String, Double>> data = observableArrayList();
+		data.add(priceSubscriberOne.getSeries());
+		data.add(priceSubscriberTwo.getSeries());
+		chart.setData(data);
 	}
 
-	@Override
-	public void accept(final StockPrice stockPrice) {
-		Platform.runLater(() ->
-				seriesData.add(new Data<>(
-						valueOf(stockPrice.getTime().getSecond()),
-						stockPrice.getPrice()))
-		);
+	private static class PriceSubscriber implements Consumer<StockPrice> {
+
+		private final ObservableList<Data<String, Double>> seriesData = observableArrayList();
+		private final Series<String, Double> series;
+
+		public PriceSubscriber(final String symbol) {
+			series = new Series<>(symbol, seriesData);
+		}
+
+		@Override
+		public void accept(final StockPrice stockPrice) {
+			Platform.runLater(() ->
+					seriesData.add(new Data<>(
+							valueOf(stockPrice.getTime().getSecond()),
+							stockPrice.getPrice()))
+			);
+		}
+
+		public Series<String, Double> getSeries() {
+			return series;
+		}
 	}
 }
